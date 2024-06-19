@@ -25,7 +25,7 @@ namespace PinewoodTask.Services
 
                 _logger.LogTrace("Adding customer...");
                 await dataContext.AddAsync(customer);
-                _logger.LogTrace("Saving...");
+                _logger.LogTrace("Saving changes...");
                 await dataContext.SaveChangesAsync();
 
                 return customer.Id;
@@ -39,22 +39,84 @@ namespace PinewoodTask.Services
 
         public async Task DeleteCustomerAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogTrace("Fetching data context...");
+                var dataContext = _serviceProvider.GetService<DataContext>();
+
+                _logger.LogTrace("Deleting customer...");
+                dataContext.Remove(dataContext.Customers.Single(x => x.Id == id));
+                _logger.LogTrace("Saving changes...");
+                await dataContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
 
         public async Task<int> UpdateCustomerAsync(Customer customer)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogTrace("Fetching data context...");
+                var dataContext = _serviceProvider.GetService<DataContext>();
+
+                _logger.LogTrace("Updating customer...");
+                dataContext.Update(customer);
+                _logger.LogTrace("Saving changes...");
+                await dataContext.SaveChangesAsync();
+
+                return customer.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
 
         public async Task<Customer> GetCustomerAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogTrace("Fetching data context...");
+                var dataContext = _serviceProvider.GetService<DataContext>();
+
+                _logger.LogTrace("Fetching customer...");
+                var customer = await dataContext.FindAsync<Customer>(id);
+                _logger.LogTrace("Saving changes...");
+                await dataContext.SaveChangesAsync();
+
+                return customer;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
 
         public async Task<List<Customer>> GetCustomersAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogTrace("Fetching data context...");
+                var dataContext = _serviceProvider.GetService<DataContext>();
+
+                _logger.LogTrace("Fetching customers...");
+                var customers = (from c in dataContext.Customers select c).ToList();
+                _logger.LogTrace("Saving changes...");
+                await dataContext.SaveChangesAsync();
+
+                return customers;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
     }
 }
