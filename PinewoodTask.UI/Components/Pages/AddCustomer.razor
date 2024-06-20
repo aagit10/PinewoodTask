@@ -1,0 +1,72 @@
+﻿@page "/customer/add"
+@page "/customer/edit/{id:int}"
+@inject IPinewoodTaskAPIWorker worker
+@inject NavigationManager NavigationManager
+
+<PageTitle>Add Customer</PageTitle>
+<h3>@Title Customer</h3>
+<hr />
+<EditForm Model="customer" OnSubmit="SaveCustomer" FormName="AddEditCustomer" >
+    <div class="mb-3">
+        <label for="FirstName" class="form-label">First Name</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="customer!.FirstName" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="LastName" class="form-label">Last name</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="customer!.LastName" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="customer!.Email" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="Phone" class="form-label">Phone</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="customer!.Phone" />
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="reset" class="btn btn-secondary" @onclick="@(() => customer = new())">Reset</button>
+    </div>
+</EditForm>
+
+@code {
+    private bool isDirty = false;
+
+    [Parameter]
+    public int id { get; set; }
+
+    protected string Title = "Add";
+
+    [SupplyParameterFromForm]
+    public PinewoodTask.UI.Customer? customer { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id != 0)
+        {
+            Title = "Edit";
+            customer = await worker.GetCustomerAsync(id);
+        }
+    }
+
+    private async Task SaveCustomer()
+    {
+        if (customer.Id != 0)
+        {
+            await worker.UpdateCustomerAsync(customer);
+        }
+        else
+        {
+            await worker.AddCustomerAsync(customer);
+        }
+        NavigationManager.NavigateTo("/customer");
+    }
+}

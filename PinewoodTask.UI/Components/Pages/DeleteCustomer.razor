@@ -1,0 +1,53 @@
+﻿@page "/customer/delete/{id:int}"
+@inject IPinewoodTaskAPIWorker worker
+@inject NavigationManager NavigationManager
+<h2>Delete Customer</h2>
+<br />
+<EditForm Model="customer" OnSubmit="RemoveCustomer" FormName="DeleteCustomer">
+    <div class="form-group">
+        <h4>Do you want to delete this customer?</h4>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td>First name</td>
+                    <td>@customer!.FirstName</td>
+                </tr>
+                <tr>
+                    <td>Last name</td>
+                    <td>@customer!.LastName</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>@customer!.Email</td>
+                </tr>
+                <tr>
+                    <td>Phone</td>
+                    <td>@customer!.Phone</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Delete" @onclick="RemoveCustomer" class="btn btn-danger" />
+        <div type="button" class="btn btn-warning" @onclick="Cancel">Cancel</div>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    PinewoodTask.UI.Customer? customer { get; set; } = new();
+
+    protected override async Task OnInitializedAsync() => customer = await worker.GetCustomerAsync(id);
+
+    private async Task RemoveCustomer()
+    {
+        await worker.DeleteCustomerAsync(id);
+        Cancel();
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/customer");
+    }
+}
